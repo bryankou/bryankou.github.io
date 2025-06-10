@@ -42,6 +42,31 @@
         setInterval(updateClock, 1000);
                 updateClock(); // Initial call
         
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = localStorage.getItem('theme');
+            
+            if (currentTheme === 'light') {
+                body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Initialize theme from localStorage
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        }
+        
+        // Call on page load
+        initializeTheme();
+        
         // Folder functionality
         let currentFolder = null;
         const overlay = document.getElementById('overlay');
@@ -303,6 +328,23 @@
                 folder.setAttribute('role', 'button');
                 folder.setAttribute('aria-label', `Open ${folder.getAttribute('data-folder')} folder`);
             });
+            
+            // Theme toggle event listener
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+                themeToggle.setAttribute('tabindex', '0');
+                themeToggle.setAttribute('role', 'button');
+                themeToggle.setAttribute('aria-label', 'Toggle dark/light mode');
+                
+                // Keyboard accessibility for theme toggle
+                themeToggle.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleTheme();
+                    }
+                });
+            }
         });
     </script>
 </body>

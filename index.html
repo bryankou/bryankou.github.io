@@ -5,18 +5,42 @@ layout: default
 <div class="computer-container">
   <svg viewBox="0 0 800 600" class="computer-svg">
     <!-- Computer Monitor -->
-    <rect x="50" y="50" width="700" height="450" rx="20" ry="20" fill="#2a2a2a" stroke="#1a1a1a" stroke-width="3"/>
-    <rect x="70" y="80" width="660" height="380" rx="5" ry="5" fill="#0a0a0a"/>
+    <rect x="50" y="50" width="700" height="450" rx="20" ry="20" class="monitor-frame" stroke="#1a1a1a" stroke-width="3"/>
+    <rect x="70" y="80" width="660" height="380" rx="5" ry="5" class="screen-bg"/>
     
     <!-- Screen Content -->
-    <rect x="80" y="90" width="640" height="360" fill="#1e3a8a"/>
+    <rect x="80" y="90" width="640" height="360" fill="url(#desktopGradient)"/>
     
     <!-- Title Bar -->
-    <rect x="80" y="90" width="640" height="30" fill="#374151"/>
+    <rect x="80" y="90" width="640" height="30" class="titlebar"/>
     <circle cx="100" cy="105" r="6" fill="#ef4444"/>
     <circle cx="120" cy="105" r="6" fill="#f59e0b"/>
     <circle cx="140" cy="105" r="6" fill="#10b981"/>
-    <text x="400" y="110" text-anchor="middle" fill="#e5e7eb" font-family="monospace" font-size="12">{{ site.author.name }} - Desktop</text>
+    <text x="400" y="110" text-anchor="middle" class="title-text" font-family="monospace" font-size="12">{{ site.author.name }} - Desktop</text>
+    
+    <!-- Dark/Light Mode Toggle -->
+    <g class="theme-toggle" id="theme-toggle">
+      <!-- Clickable area -->
+      <circle cx="700" cy="105" r="12" fill="transparent" style="cursor: pointer;"/>
+      
+      <!-- Sun Icon (for dark mode) -->
+      <g class="sun-icon" id="sun-icon" style="pointer-events: none;">
+        <circle cx="700" cy="105" r="4" class="theme-icon-fill"/>
+        <line x1="700" y1="95" x2="700" y2="97" class="theme-icon-stroke" stroke-width="1"/>
+        <line x1="700" y1="113" x2="700" y2="115" class="theme-icon-stroke" stroke-width="1"/>
+        <line x1="690" y1="105" x2="692" y2="105" class="theme-icon-stroke" stroke-width="1"/>
+        <line x1="708" y1="105" x2="710" y2="105" class="theme-icon-stroke" stroke-width="1"/>
+        <line x1="692.9" y1="97.9" x2="694.3" y2="99.3" class="theme-icon-stroke" stroke-width="1"/>
+        <line x1="705.7" y1="110.7" x2="707.1" y2="112.1" class="theme-icon-stroke" stroke-width="1"/>
+        <line x1="707.1" y1="97.9" x2="705.7" y2="99.3" class="theme-icon-stroke" stroke-width="1"/>
+        <line x1="694.3" y1="110.7" x2="692.9" y2="112.1" class="theme-icon-stroke" stroke-width="1"/>
+      </g>
+      
+      <!-- Moon Icon (for dark mode) -->
+      <g class="moon-icon" id="moon-icon" style="pointer-events: none;">
+        <path d="M 705 105 A 6 6 0 1 0 705 105.01 A 4 4 0 1 1 705 105 Z" fill="white"/>
+      </g>
+    </g>
     
     <!-- Desktop Background -->
     <rect x="80" y="120" width="640" height="330" fill="url(#desktopGradient)"/>
@@ -24,47 +48,67 @@ layout: default
     <!-- Folder Icons -->
     <!-- About Folder -->
     <g class="folder" data-folder="about" transform="translate(120, 160)">
-      <path d="M8 8 Q8 4 12 4 L18 4 Q22 4 24 0 L68 0 Q72 0 72 4 L72 44 Q72 48 68 48 L12 48 Q8 48 8 44 Z" fill="#fbbf24" stroke="none"/>
-      <path d="M12 12 Q12 10 14 10 L20 10 Q22 10 22 12 L22 14 Q22 16 20 16 L14 16 Q12 16 12 14 Z" fill="#f59e0b" opacity="0.8"/>
-      <text x="40" y="65" text-anchor="middle" fill="#1f2937" font-family="Inter, sans-serif" font-size="11" font-weight="500">about</text>
+      <!-- Main folder body -->
+      <rect x="8" y="16" width="64" height="40" fill="#fbbf24" stroke="#f59e0b" stroke-width="1"/>
+      <!-- Folder tab -->
+      <rect x="8" y="8" width="24" height="12" fill="#fbbf24" stroke="#f59e0b" stroke-width="1"/>
+      <!-- Front face highlight -->
+      <rect x="12" y="20" width="56" height="32" fill="#fff3cd" opacity="0.3"/>
+      <text x="40" y="70" text-anchor="middle" fill="#ffffff" font-family="Inter, sans-serif" font-size="11" font-weight="500">about</text>
     </g>
     
     <!-- Work Folder -->
     <g class="folder" data-folder="work" transform="translate(250, 160)">
-      <path d="M8 8 Q8 4 12 4 L18 4 Q22 4 24 0 L68 0 Q72 0 72 4 L72 44 Q72 48 68 48 L12 48 Q8 48 8 44 Z" fill="#60a5fa" stroke="none"/>
-      <path d="M12 12 Q12 10 14 10 L20 10 Q22 10 22 12 L22 14 Q22 16 20 16 L14 16 Q12 16 12 14 Z" fill="#3b82f6" opacity="0.8"/>
-      <text x="40" y="65" text-anchor="middle" fill="#1f2937" font-family="Inter, sans-serif" font-size="11" font-weight="500">work</text>
+      <!-- Main folder body -->
+      <rect x="8" y="16" width="64" height="40" fill="#60a5fa" stroke="#3b82f6" stroke-width="1"/>
+      <!-- Folder tab -->
+      <rect x="8" y="8" width="24" height="12" fill="#60a5fa" stroke="#3b82f6" stroke-width="1"/>
+      <!-- Front face highlight -->
+      <rect x="12" y="20" width="56" height="32" fill="#dbeafe" opacity="0.3"/>
+      <text x="40" y="70" text-anchor="middle" fill="#ffffff" font-family="Inter, sans-serif" font-size="11" font-weight="500">work</text>
     </g>
     
     <!-- Contact Folder -->
     <g class="folder" data-folder="contact" transform="translate(380, 160)">
-      <path d="M8 8 Q8 4 12 4 L18 4 Q22 4 24 0 L68 0 Q72 0 72 4 L72 44 Q72 48 68 48 L12 48 Q8 48 8 44 Z" fill="#34d399" stroke="none"/>
-      <path d="M12 12 Q12 10 14 10 L20 10 Q22 10 22 12 L22 14 Q22 16 20 16 L14 16 Q12 16 12 14 Z" fill="#10b981" opacity="0.8"/>
-      <text x="40" y="65" text-anchor="middle" fill="#1f2937" font-family="Inter, sans-serif" font-size="11" font-weight="500">contact</text>
+      <!-- Main folder body -->
+      <rect x="8" y="16" width="64" height="40" fill="#34d399" stroke="#10b981" stroke-width="1"/>
+      <!-- Folder tab -->
+      <rect x="8" y="8" width="24" height="12" fill="#34d399" stroke="#10b981" stroke-width="1"/>
+      <!-- Front face highlight -->
+      <rect x="12" y="20" width="56" height="32" fill="#d1fae5" opacity="0.3"/>
+      <text x="40" y="70" text-anchor="middle" fill="#ffffff" font-family="Inter, sans-serif" font-size="11" font-weight="500">contact</text>
     </g>
     
     <!-- Projects Folder -->
     <g class="folder" data-folder="projects" transform="translate(510, 160)">
-      <path d="M8 8 Q8 4 12 4 L18 4 Q22 4 24 0 L68 0 Q72 0 72 4 L72 44 Q72 48 68 48 L12 48 Q8 48 8 44 Z" fill="#f87171" stroke="none"/>
-      <path d="M12 12 Q12 10 14 10 L20 10 Q22 10 22 12 L22 14 Q22 16 20 16 L14 16 Q12 16 12 14 Z" fill="#ef4444" opacity="0.8"/>
-      <text x="40" y="65" text-anchor="middle" fill="#1f2937" font-family="Inter, sans-serif" font-size="11" font-weight="500">projects</text>
+      <!-- Main folder body -->
+      <rect x="8" y="16" width="64" height="40" fill="#f87171" stroke="#ef4444" stroke-width="1"/>
+      <!-- Folder tab -->
+      <rect x="8" y="8" width="24" height="12" fill="#f87171" stroke="#ef4444" stroke-width="1"/>
+      <!-- Front face highlight -->
+      <rect x="12" y="20" width="56" height="32" fill="#fee2e2" opacity="0.3"/>
+      <text x="40" y="70" text-anchor="middle" fill="#ffffff" font-family="Inter, sans-serif" font-size="11" font-weight="500">projects</text>
     </g>
     
     <!-- Taskbar -->
-    <rect x="80" y="420" width="640" height="30" fill="#374151"/>
-    <text x="100" y="440" fill="#e5e7eb" font-family="monospace" font-size="12">{{ site.title }}</text>
-    <text x="710" y="440" text-anchor="end" fill="#e5e7eb" font-family="monospace" font-size="10" id="current-time"></text>
+    <rect x="80" y="420" width="640" height="30" class="taskbar"/>
+    <text x="100" y="440" class="title-text" font-family="monospace" font-size="12">{{ site.title }}</text>
+    <text x="710" y="440" text-anchor="end" class="time-text" font-family="monospace" font-size="10" id="current-time"></text>
     
     <!-- Computer Stand -->
     <rect x="320" y="500" width="160" height="15" rx="7" fill="#4b5563"/>
     <rect x="350" y="515" width="100" height="40" rx="10" fill="#6b7280"/>
     
-    <!-- Gradients -->
+    <!-- Gradients and Masks -->
     <defs>
       <linearGradient id="desktopGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#1e3a8a"/>
-        <stop offset="100%" stop-color="#1e40af"/>
+        <stop offset="0%" class="desktop-gradient-start"/>
+        <stop offset="100%" class="desktop-gradient-end"/>
       </linearGradient>
+      <mask id="moonMask">
+        <rect x="690" y="95" width="20" height="20" fill="white"/>
+        <circle cx="702" cy="105" r="4" fill="black"/>
+      </mask>
     </defs>
   </svg>
   
