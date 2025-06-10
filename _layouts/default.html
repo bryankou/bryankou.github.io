@@ -18,8 +18,250 @@
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 </head>
 <body>
+    <div class="overlay" id="overlay"></div>
     <main class="container">
         {{ content }}
     </main>
+    
+    <script>
+        // Clock functionality
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            const clockElement = document.getElementById('current-time');
+            if (clockElement) {
+                clockElement.textContent = timeString;
+            }
+        }
+        
+        // Update clock every second
+        setInterval(updateClock, 1000);
+        updateClock(); // Initial call
+        
+        // Test function - remove after testing
+        window.testOpenFolder = function(folderName) {
+            console.log('Manual test opening folder:', folderName);
+            openFolder(folderName);
+        }
+        
+        // Force show modal test
+        window.testShowModal = function() {
+            console.log('Testing modal display directly');
+            const modal = document.getElementById('about-content');
+            if (modal) {
+                modal.style.display = 'block';
+                modal.style.position = 'fixed';
+                modal.style.top = '50%';
+                modal.style.left = '50%';
+                modal.style.transform = 'translate(-50%, -50%)';
+                modal.style.zIndex = '9999';
+                modal.style.background = 'red'; // Make it obvious
+                console.log('Modal should now be visible');
+            } else {
+                console.log('Modal element not found');
+            }
+        }
+        
+        // Folder functionality
+        let currentFolder = null;
+        const overlay = document.getElementById('overlay');
+        
+        // Drag functionality
+        let isDragging = false;
+        let draggedElement = null;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let elementStartX = 0;
+        let elementStartY = 0;
+        let dragThreshold = 10; // Minimum distance to start drag
+        let mouseDownTime = 0;
+        
+        function openFolder(folderName) {
+            console.log('openFolder called with:', folderName); // Debug log
+            
+            // Close any currently open folder
+            if (currentFolder) {
+                console.log('Closing current folder:', currentFolder);
+                closeFolder();
+            }
+            
+            // Open the selected folder
+            const contentId = folderName + '-content';
+            console.log('Looking for element with ID:', contentId);
+            const folderContent = document.getElementById(contentId);
+            const folderElement = document.querySelector(`[data-folder="${folderName}"]`);
+            
+            console.log('folderContent element:', folderContent);
+            console.log('folderElement:', folderElement);
+            console.log('overlay element:', overlay);
+            
+            if (folderContent && folderElement) {
+                console.log('Adding active classes');
+                console.log('folderContent classes before:', folderContent.className);
+                folderContent.classList.add('active');
+                console.log('folderContent classes after:', folderContent.className);
+                
+                folderElement.classList.add('active');
+                overlay.classList.add('active');
+                currentFolder = folderName;
+                
+                // Force a style check
+                console.log('folderContent display style:', window.getComputedStyle(folderContent).display);
+                console.log('folderContent visibility:', window.getComputedStyle(folderContent).visibility);
+                console.log('folderContent z-index:', window.getComputedStyle(folderContent).zIndex);
+            } else {
+                console.log('Could not find elements for folder:', folderName);
+                console.log('Available elements with -content IDs:', 
+                    Array.from(document.querySelectorAll('[id$="-content"]')).map(el => el.id));
+            }
+        }
+        
+        function closeFolder() {
+            if (currentFolder) {
+                const folderContent = document.getElementById(currentFolder + '-content');
+                const folderElement = document.querySelector(`[data-folder="${currentFolder}"]`);
+                
+                if (folderContent && folderElement) {
+                    folderContent.classList.remove('active');
+                    folderElement.classList.remove('active');
+                }
+                
+                overlay.classList.remove('active');
+                currentFolder = null;
+            }
+        }
+        
+        function startDrag(e, folder) {
+            console.log('startDrag called for:', folder.getAttribute('data-folder')); // Debug log
+            isDragging = false;
+            draggedElement = folder;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            mouseDownTime = Date.now();
+            
+            // Get current transform
+            const transform = folder.getAttribute('transform');
+            const match = transform.match(/translate\(([^,]+),\s*([^)]+)\)/);
+            if (match) {
+                elementStartX = parseFloat(match[1]);
+                elementStartY = parseFloat(match[2]);
+            } else {
+                elementStartX = 0;
+                elementStartY = 0;
+            }
+            
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        function handleDrag(e) {
+            if (!draggedElement) return;
+            
+            const deltaX = e.clientX - dragStartX;
+            const deltaY = e.clientY - dragStartY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            // Check if we've moved enough to start dragging
+            if (!isDragging && distance > dragThreshold) {
+                isDragging = true;
+                draggedElement.classList.add('dragging');
+                draggedElement.style.cursor = 'grabbing';
+                console.log('Started dragging'); // Debug log
+            }
+            
+            if (isDragging) {
+                const newX = elementStartX + deltaX;
+                const newY = elementStartY + deltaY;
+                
+                // Keep folders within blue desktop area bounds
+                // Desktop area: x=80, y=120, width=640, height=330
+                const minX = 80;
+                const minY = 120;
+                const maxX = 80 + 640 - 80; // desktop x + width - folder width
+                const maxY = 120 + 330 - 65; // desktop y + height - folder height
+                const clampedX = Math.max(minX, Math.min(newX, maxX));
+                const clampedY = Math.max(minY, Math.min(newY, maxY));
+                
+                draggedElement.setAttribute('transform', `translate(${clampedX}, ${clampedY})`);
+            }
+        }
+        
+        function endDrag(e) {
+            if (draggedElement) {
+                const clickTime = Date.now() - mouseDownTime;
+                const deltaX = e.clientX - dragStartX;
+                const deltaY = e.clientY - dragStartY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                draggedElement.style.cursor = 'grab';
+                draggedElement.classList.remove('dragging');
+                
+                // If we didn't drag much and it was a quick action, treat as click
+                if (!isDragging && distance < dragThreshold && clickTime < 500) {
+                    const folderName = draggedElement.getAttribute('data-folder');
+                    console.log('Folder clicked (not dragged):', folderName, 'distance:', distance, 'time:', clickTime); // Debug log
+                    openFolder(folderName);
+                }
+                
+                draggedElement = null;
+                isDragging = false;
+            }
+        }
+        
+        // Add drag and click event listeners to folders
+        document.addEventListener('DOMContentLoaded', function() {
+            const folders = document.querySelectorAll('.folder');
+            console.log('Found folders:', folders.length); // Debug log
+            
+            folders.forEach(folder => {
+                folder.style.cursor = 'grab';
+                
+                // Mouse events for drag functionality
+                folder.addEventListener('mousedown', function(e) {
+                    console.log('Mouse down on folder:', this.getAttribute('data-folder')); // Debug log
+                    startDrag(e, this);
+                });
+                
+                // Also add listeners to child elements to ensure clicking works
+                const childElements = folder.querySelectorAll('*');
+                childElements.forEach(child => {
+                    child.addEventListener('mousedown', function(e) {
+                        console.log('Mouse down on child element'); // Debug log
+                        e.stopPropagation();
+                        startDrag(e, folder);
+                    });
+                });
+            });
+            
+            // Global mouse events for dragging
+            document.addEventListener('mousemove', handleDrag);
+            document.addEventListener('mouseup', endDrag);
+            
+            // Close folder when clicking overlay
+            overlay.addEventListener('click', closeFolder);
+            
+            // Close folder when clicking the X button (::before pseudo-element)
+            document.addEventListener('click', function(e) {
+                const rect = e.target.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                if (e.target.classList.contains('folder-content') && x > rect.width - 40 && y < 40) {
+                    closeFolder();
+                }
+            });
+            
+            // Close folder with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && currentFolder) {
+                    closeFolder();
+                }
+            });
+        });
+    </script>
 </body>
 </html> 
