@@ -175,8 +175,8 @@
             if (isDragging) {
                 // Try direct 1:1 movement first (no scaling)
                 // If this is too fast, we'll adjust down; if too slow, we'll adjust up
-                const scaledDeltaX = deltaX * 1.0;
-                const scaledDeltaY = deltaY * 1.0;
+                const scaledDeltaX = deltaX * 0.51;
+                const scaledDeltaY = deltaY * 0.51;
                 
                 const newX = elementStartX + scaledDeltaX;
                 const newY = elementStartY + scaledDeltaY;
