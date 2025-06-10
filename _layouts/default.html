@@ -40,31 +40,7 @@
         
         // Update clock every second
         setInterval(updateClock, 1000);
-        updateClock(); // Initial call
-        
-        // Test function - remove after testing
-        window.testOpenFolder = function(folderName) {
-            console.log('Manual test opening folder:', folderName);
-            openFolder(folderName);
-        }
-        
-        // Force show modal test
-        window.testShowModal = function() {
-            console.log('Testing modal display directly');
-            const modal = document.getElementById('about-content');
-            if (modal) {
-                modal.style.display = 'block';
-                modal.style.position = 'fixed';
-                modal.style.top = '50%';
-                modal.style.left = '50%';
-                modal.style.transform = 'translate(-50%, -50%)';
-                modal.style.zIndex = '9999';
-                modal.style.background = 'red'; // Make it obvious
-                console.log('Modal should now be visible');
-            } else {
-                console.log('Modal element not found');
-            }
-        }
+                updateClock(); // Initial call
         
         // Folder functionality
         let currentFolder = null;
@@ -81,43 +57,31 @@
         let mouseDownTime = 0;
         
         function openFolder(folderName) {
-            console.log('openFolder called with:', folderName); // Debug log
+            // Don't open the same folder if it's already open
+            if (currentFolder === folderName) {
+                closeFolder();
+                return;
+            }
             
             // Close any currently open folder
             if (currentFolder) {
-                console.log('Closing current folder:', currentFolder);
                 closeFolder();
             }
             
-            // Open the selected folder
-            const contentId = folderName + '-content';
-            console.log('Looking for element with ID:', contentId);
-            const folderContent = document.getElementById(contentId);
-            const folderElement = document.querySelector(`[data-folder="${folderName}"]`);
-            
-            console.log('folderContent element:', folderContent);
-            console.log('folderElement:', folderElement);
-            console.log('overlay element:', overlay);
-            
-            if (folderContent && folderElement) {
-                console.log('Adding active classes');
-                console.log('folderContent classes before:', folderContent.className);
-                folderContent.classList.add('active');
-                console.log('folderContent classes after:', folderContent.className);
+            // Small delay to ensure smooth transition
+            setTimeout(() => {
+                // Open the selected folder
+                const contentId = folderName + '-content';
+                const folderContent = document.getElementById(contentId);
+                const folderElement = document.querySelector(`[data-folder="${folderName}"]`);
                 
-                folderElement.classList.add('active');
-                overlay.classList.add('active');
-                currentFolder = folderName;
-                
-                // Force a style check
-                console.log('folderContent display style:', window.getComputedStyle(folderContent).display);
-                console.log('folderContent visibility:', window.getComputedStyle(folderContent).visibility);
-                console.log('folderContent z-index:', window.getComputedStyle(folderContent).zIndex);
-            } else {
-                console.log('Could not find elements for folder:', folderName);
-                console.log('Available elements with -content IDs:', 
-                    Array.from(document.querySelectorAll('[id$="-content"]')).map(el => el.id));
-            }
+                if (folderContent && folderElement) {
+                    folderContent.classList.add('active');
+                    folderElement.classList.add('active');
+                    overlay.classList.add('active');
+                    currentFolder = folderName;
+                }
+            }, currentFolder ? 100 : 0);
         }
         
         function closeFolder() {
@@ -136,7 +100,6 @@
         }
         
         function startDrag(e, folder) {
-            console.log('startDrag called for:', folder.getAttribute('data-folder')); // Debug log
             isDragging = false;
             draggedElement = folder;
             dragStartX = e.clientX;
@@ -150,8 +113,20 @@
                 elementStartX = parseFloat(match[1]);
                 elementStartY = parseFloat(match[2]);
             } else {
-                elementStartX = 0;
-                elementStartY = 0;
+                // Get default position from folder data attribute or use fallback
+                const folderName = folder.getAttribute('data-folder');
+                const defaultPositions = {
+                    'about': { x: 120, y: 160 },
+                    'work': { x: 250, y: 160 },
+                    'social': { x: 380, y: 160 },
+                    'contact': { x: 510, y: 160 }
+                };
+                const defaultPos = defaultPositions[folderName] || { x: 120, y: 160 };
+                elementStartX = defaultPos.x;
+                elementStartY = defaultPos.y;
+                
+                // Set the initial transform if it doesn't exist
+                folder.setAttribute('transform', `translate(${elementStartX}, ${elementStartY})`);
             }
             
             e.preventDefault();
@@ -170,19 +145,25 @@
                 isDragging = true;
                 draggedElement.classList.add('dragging');
                 draggedElement.style.cursor = 'grabbing';
-                console.log('Started dragging'); // Debug log
             }
             
             if (isDragging) {
-                const newX = elementStartX + deltaX;
-                const newY = elementStartY + deltaY;
+                // Get accurate scaling based on actual SVG dimensions
+                const svg = document.querySelector('.computer-svg');
+                const svgRect = svg.getBoundingClientRect();
                 
-                // Keep folders within blue desktop area bounds
-                // Desktop area: x=80, y=120, width=640, height=330
-                const minX = 80;
-                const minY = 120;
-                const maxX = 80 + 640 - 80; // desktop x + width - folder width
-                const maxY = 120 + 330 - 65; // desktop y + height - folder height
+                // Calculate precise scale factors
+                const scaleX = 800 / svgRect.width;  // SVG viewBox width / actual display width
+                const scaleY = 600 / svgRect.height; // SVG viewBox height / actual display height
+                
+                const scaledDeltaX = deltaX * scaleX;
+                const scaledDeltaY = deltaY * scaleY;
+                
+                const newX = elementStartX + scaledDeltaX;
+                const newY = elementStartY + scaledDeltaY;
+                
+                // Apply boundaries  
+                const minX = 80, minY = 120, maxX = 640, maxY = 385;
                 const clampedX = Math.max(minX, Math.min(newX, maxX));
                 const clampedY = Math.max(minY, Math.min(newY, maxY));
                 
@@ -203,7 +184,6 @@
                 // If we didn't drag much and it was a quick action, treat as click
                 if (!isDragging && distance < dragThreshold && clickTime < 500) {
                     const folderName = draggedElement.getAttribute('data-folder');
-                    console.log('Folder clicked (not dragged):', folderName, 'distance:', distance, 'time:', clickTime); // Debug log
                     openFolder(folderName);
                 }
                 
@@ -215,24 +195,37 @@
         // Add drag and click event listeners to folders
         document.addEventListener('DOMContentLoaded', function() {
             const folders = document.querySelectorAll('.folder');
-            console.log('Found folders:', folders.length); // Debug log
             
             folders.forEach(folder => {
                 folder.style.cursor = 'grab';
                 
                 // Mouse events for drag functionality
                 folder.addEventListener('mousedown', function(e) {
-                    console.log('Mouse down on folder:', this.getAttribute('data-folder')); // Debug log
                     startDrag(e, this);
+                });
+                
+                // Double-click to open folder (alternative to single click)
+                folder.addEventListener('dblclick', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const folderName = this.getAttribute('data-folder');
+                    openFolder(folderName);
                 });
                 
                 // Also add listeners to child elements to ensure clicking works
                 const childElements = folder.querySelectorAll('*');
                 childElements.forEach(child => {
                     child.addEventListener('mousedown', function(e) {
-                        console.log('Mouse down on child element'); // Debug log
                         e.stopPropagation();
                         startDrag(e, folder);
+                    });
+                    
+                    // Double-click on child elements
+                    child.addEventListener('dblclick', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const folderName = folder.getAttribute('data-folder');
+                        openFolder(folderName);
                     });
                 });
             });
@@ -242,16 +235,21 @@
             document.addEventListener('mouseup', endDrag);
             
             // Close folder when clicking overlay
-            overlay.addEventListener('click', closeFolder);
+            overlay.addEventListener('click', function(e) {
+                closeFolder();
+            });
             
             // Close folder when clicking the X button (::before pseudo-element)
             document.addEventListener('click', function(e) {
-                const rect = e.target.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                if (e.target.classList.contains('folder-content') && x > rect.width - 40 && y < 40) {
-                    closeFolder();
+                if (e.target.classList.contains('folder-content')) {
+                    const rect = e.target.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    // Check if clicked in top-right corner (X button area)
+                    if (x > rect.width - 40 && y < 40) {
+                        closeFolder();
+                    }
                 }
             });
             
@@ -260,6 +258,56 @@
                 if (e.key === 'Escape' && currentFolder) {
                     closeFolder();
                 }
+            });
+            
+            // Prevent clicks inside folder content from closing the modal
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.folder-content')) {
+                    e.stopPropagation();
+                }
+            });
+            
+            // Focus management for accessibility
+            document.addEventListener('keydown', function(e) {
+                // Tab navigation when modal is open
+                if (currentFolder && e.key === 'Tab') {
+                    const modal = document.getElementById(currentFolder + '-content');
+                    if (modal) {
+                        const focusableElements = modal.querySelectorAll('a, button, [tabindex]:not([tabindex="-1"])');
+                        if (focusableElements.length > 0) {
+                            e.preventDefault();
+                            const firstElement = focusableElements[0];
+                            const lastElement = focusableElements[focusableElements.length - 1];
+                            
+                            if (e.shiftKey) {
+                                // Shift+Tab
+                                if (document.activeElement === firstElement) {
+                                    lastElement.focus();
+                                }
+                            } else {
+                                // Tab
+                                if (document.activeElement === lastElement) {
+                                    firstElement.focus();
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Enter/Space to activate folders when focused
+                if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.folder')) {
+                    e.preventDefault();
+                    const folder = e.target.closest('.folder');
+                    const folderName = folder.getAttribute('data-folder');
+                    openFolder(folderName);
+                }
+            });
+            
+            // Make folders keyboard accessible
+            folders.forEach(folder => {
+                folder.setAttribute('tabindex', '0');
+                folder.setAttribute('role', 'button');
+                folder.setAttribute('aria-label', `Open ${folder.getAttribute('data-folder')} folder`);
             });
         });
     </script>

@@ -44,7 +44,7 @@ body {
 /* Folder Interactions */
 .folder {
     cursor: grab !important;
-    transition: all 0.2s ease;
+    transition: filter 0.2s ease, transform 0.2s ease;
     pointer-events: all;
     user-select: none;
 }
@@ -54,12 +54,13 @@ body {
     pointer-events: all;
 }
 
-.folder:hover:not(.dragging) {
+.folder:hover:not(.dragging):not(.active) {
     filter: brightness(1.1);
 }
 
 .folder.active {
-    filter: brightness(1.2);
+    filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+    /* Removed transform: scale(1.05) to prevent conflicts with drag positioning */
 }
 
 .folder.dragging {
@@ -67,10 +68,16 @@ body {
     filter: brightness(1.2) drop-shadow(0 5px 15px rgba(0, 0, 0, 0.4));
     transition: none;
     z-index: 1000;
+    /* Removed transform: scale(1.05) to prevent visual jump when dragging starts */
 }
 
 .folder.dragging * {
     cursor: grabbing !important;
+}
+
+/* Folder selection glow effect */
+.folder.active path {
+    filter: brightness(1.1);
 }
 
 /* Make sure SVG elements are interactive */
@@ -167,10 +174,17 @@ body {
     color: #9ca3af;
     cursor: pointer;
     transition: color 0.2s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
 }
 
 .folder-content::before:hover {
     color: #ef4444;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 /* Animations */
