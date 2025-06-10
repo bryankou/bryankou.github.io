@@ -36,18 +36,18 @@ layout: default
       <text x="40" y="65" text-anchor="middle" fill="#1f2937" font-family="Inter, sans-serif" font-size="11" font-weight="500">work</text>
     </g>
     
-    <!-- Social Folder -->
-    <g class="folder" data-folder="social" transform="translate(380, 160)">
+    <!-- Contact Folder -->
+    <g class="folder" data-folder="contact" transform="translate(380, 160)">
       <path d="M8 8 Q8 4 12 4 L18 4 Q22 4 24 0 L68 0 Q72 0 72 4 L72 44 Q72 48 68 48 L12 48 Q8 48 8 44 Z" fill="#34d399" stroke="none"/>
       <path d="M12 12 Q12 10 14 10 L20 10 Q22 10 22 12 L22 14 Q22 16 20 16 L14 16 Q12 16 12 14 Z" fill="#10b981" opacity="0.8"/>
-      <text x="40" y="65" text-anchor="middle" fill="#1f2937" font-family="Inter, sans-serif" font-size="11" font-weight="500">social</text>
+      <text x="40" y="65" text-anchor="middle" fill="#1f2937" font-family="Inter, sans-serif" font-size="11" font-weight="500">contact</text>
     </g>
     
-    <!-- Contact Folder -->
-    <g class="folder" data-folder="contact" transform="translate(510, 160)">
+    <!-- Projects Folder -->
+    <g class="folder" data-folder="projects" transform="translate(510, 160)">
       <path d="M8 8 Q8 4 12 4 L18 4 Q22 4 24 0 L68 0 Q72 0 72 4 L72 44 Q72 48 68 48 L12 48 Q8 48 8 44 Z" fill="#f87171" stroke="none"/>
       <path d="M12 12 Q12 10 14 10 L20 10 Q22 10 22 12 L22 14 Q22 16 20 16 L14 16 Q12 16 12 14 Z" fill="#ef4444" opacity="0.8"/>
-      <text x="40" y="65" text-anchor="middle" fill="#1f2937" font-family="Inter, sans-serif" font-size="11" font-weight="500">contact</text>
+      <text x="40" y="65" text-anchor="middle" fill="#1f2937" font-family="Inter, sans-serif" font-size="11" font-weight="500">projects</text>
     </g>
     
     <!-- Taskbar -->
@@ -72,36 +72,17 @@ layout: default
 
 <!-- Folder Content Panels - Outside of computer container -->
 <div class="folder-content" id="about-content">
-  <h2>{{ site.author.name }}</h2>
-  <p>{{ site.description }}</p>
-  <p>🍵 Likely stuck writing Rspec tests</p>
-  <p>Dev @Shopify. Trying to learn that ruby magic 🪄</p>
+  {% include about-content.html %}
 </div>
 
 <div class="folder-content" id="work-content">
-  <h2>work/</h2>
-  <p>→ currently: <strong>developer @shopify</strong></p>
-  <p>→ focus: ruby magic 🪄</p>
-  <p>→ status: debugging rspec tests</p>
-  <p>→ location: vancouver, canada</p>
-</div>
-
-<div class="folder-content" id="social-content">
-  <h2>social/</h2>
-  <div class="social-links-desktop">
-    <a href="{{ site.author.github }}" target="_blank" class="social-link-desktop">
-      <i class="fab fa-github"></i> github
-    </a>
-    <a href="{{ site.author.linkedin }}" target="_blank" class="social-link-desktop">
-      <i class="fab fa-linkedin"></i> linkedin
-    </a>
-  </div>
+  {% include work-content.html %}
 </div>
 
 <div class="folder-content" id="contact-content">
-  <h2>contact/</h2>
-  <p>→ location: vancouver, canada</p>
-  <p>→ timezone: utc-07:00</p>
-  <p>→ email: [available on linkedin]</p>
-  <p>→ preferred: professional inquiries via linkedin</p>
+  {% include contact-content.html %}
+</div>
+
+<div class="folder-content" id="projects-content">
+  {% include projects-content.html %}
 </div> 
