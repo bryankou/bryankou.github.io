@@ -1,0 +1,22 @@
+title: Bryan Kou
+description: Developer @Shopify
+baseurl: ""
+url: "https://bryankou.github.io"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+plugins:
+  - jekyll-feed
+
+# Social links
+author:
+  name: Bryan Kou
+  linkedin: https://www.linkedin.com/in/bryan-kou
+  github: https://github.com/bryankou
+
+# Exclude from processing
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock 
