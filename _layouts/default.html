@@ -148,16 +148,10 @@
             }
             
             if (isDragging) {
-                // Get accurate scaling based on actual SVG dimensions
-                const svg = document.querySelector('.computer-svg');
-                const svgRect = svg.getBoundingClientRect();
-                
-                // Calculate precise scale factors
-                const scaleX = 800 / svgRect.width;  // SVG viewBox width / actual display width
-                const scaleY = 600 / svgRect.height; // SVG viewBox height / actual display height
-                
-                const scaledDeltaX = deltaX * scaleX;
-                const scaledDeltaY = deltaY * scaleY;
+                // Try direct 1:1 movement first (no scaling)
+                // If this is too fast, we'll adjust down; if too slow, we'll adjust up
+                const scaledDeltaX = deltaX * 1.0;
+                const scaledDeltaY = deltaY * 1.0;
                 
                 const newX = elementStartX + scaledDeltaX;
                 const newY = elementStartY + scaledDeltaY;
